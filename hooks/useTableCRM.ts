@@ -98,28 +98,43 @@ export function useTableCRM() {
   const handleSearchProducts = useCallback((query: string) => {
     setSearchProduct(query);
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    
     if (!query.trim() || !token) {
       setFoundProducts([]);
       setProductSearchOpen(false);
       return;
     }
+    
     setIsSearchingProducts(true);
+    
     searchTimerRef.current = setTimeout(async () => {
       try {
         const res = await fetch(`/api/nomenclature?search=${encodeURIComponent(query)}&token=${token}`);
         if (res.ok) {
           const data = await res.json();
-          setFoundProducts(data.result || []);
-          setProductSearchOpen(true);
+          const allProducts = data.result || [];
+          
+          // КЛИЕНТСКАЯ ФИЛЬТРАЦИЯ — если API не фильтрует
+          const filtered = allProducts.filter((product: any) => 
+            product.name?.toLowerCase().includes(query.toLowerCase())
+          );
+          
+          console.log(`🔍 Запрос: "${query}" | API вернул: ${allProducts.length} | После фильтра: ${filtered.length}`);
+          
+          setFoundProducts(filtered);
+          setProductSearchOpen(filtered.length > 0);
+        } else {
+          setFoundProducts([]);
+          setProductSearchOpen(false);
         }
       } catch {
         setFoundProducts([]);
+        setProductSearchOpen(false);
       } finally {
         setIsSearchingProducts(false);
       }
     }, 500);
   }, [token]);
-
   const addToCart = (product: any) => {
     const idx = cartItems.findIndex(i => i.nomenclature_id === product.id);
     if (idx >= 0) {
@@ -139,19 +154,39 @@ export function useTableCRM() {
     setProductSearchOpen(false);
   };
 
-  const updateCartItemQuantity = (id: number, delta: number) => {
+  const MAX_PRICE_LENGTH = 6;
+  const MAX_QUANTITY = 20;   
+  
+  const updateCartItemPrice = (id: number, newPrice: number) => {
+
+    let price = Math.round(newPrice * 100) / 100;
+    
+    const parts = price.toString().split('.');
+    if (parts[0].length > MAX_PRICE_LENGTH) {
+      parts[0] = parts[0].slice(0, MAX_PRICE_LENGTH);
+      price = parseFloat(parts.join('.'));
+    }
+    
+
+    price = Math.max(0, price);
+    
     setCartItems(prev =>
       prev.map(item =>
-        item.nomenclature_id === id ? { ...item, quantity: Math.max(0, item.quantity + delta) } : item
-      ).filter(item => item.quantity > 0)
+        item.nomenclature_id === id ? { ...item, price } : item
+      )
     );
   };
-
-  const updateCartItemPrice = (id: number, newPrice: number) => {
+  
+  const updateCartItemQuantity = (id: number, delta: number) => {
     setCartItems(prev =>
-      prev.map(item =>
-        item.nomenclature_id === id ? { ...item, price: Math.max(0, newPrice) } : item
-      )
+      prev.map(item => {
+        if (item.nomenclature_id !== id) return item;
+        const newQuantity = item.quantity + delta;
+        return { 
+          ...item, 
+          quantity: Math.max(0, Math.min(newQuantity, MAX_QUANTITY)) 
+        };
+      }).filter(item => item.quantity > 0)
     );
   };
 
@@ -206,6 +241,8 @@ export function useTableCRM() {
       setIsCreatingSale(false);
     }
   };
+
+
 
   return {
     // состояния

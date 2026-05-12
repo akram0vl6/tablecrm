@@ -11,7 +11,7 @@ interface CommentSectionProps {
 
 export function CommentSection({ comment, setComment, isConnected }: CommentSectionProps) {
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
+    <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 mb-20">
       <CardContent className="pt-5 space-y-3">
         <div className="flex items-center gap-2 text-indigo-700">
           <MessageSquare className="h-5 w-5" />

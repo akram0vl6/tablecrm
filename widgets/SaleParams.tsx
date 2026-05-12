@@ -40,7 +40,7 @@ export function SaleParams({ isConnected, organizations, payboxes, warehouses, p
               </SelectTrigger>
               <SelectContent>
                 {organizations.map((org) => (
-                  <SelectItem key={org.id} value={org.id.toString()}>
+                  <SelectItem key={org.id} value={org.id.toString()} className="bg-white">
                     {org.short_name || org.full_name || org.work_name || org.name || `Орг #${org.id}`}
                   </SelectItem>
                 ))}
@@ -57,7 +57,7 @@ export function SaleParams({ isConnected, organizations, payboxes, warehouses, p
               </SelectTrigger>
               <SelectContent>
                 {payboxes.map((pb) => (
-                  <SelectItem key={pb.id} value={pb.id.toString()}>
+                  <SelectItem key={pb.id} value={pb.id.toString()} className="bg-white">
                     {pb.name}
                   </SelectItem>
                 ))}
@@ -74,7 +74,7 @@ export function SaleParams({ isConnected, organizations, payboxes, warehouses, p
               </SelectTrigger>
               <SelectContent>
                 {warehouses.map((wh) => (
-                  <SelectItem key={wh.id} value={wh.id.toString()}>
+                  <SelectItem key={wh.id} value={wh.id.toString()} className="bg-white">
                     {wh.name}
                   </SelectItem>
                 ))}
@@ -91,7 +91,7 @@ export function SaleParams({ isConnected, organizations, payboxes, warehouses, p
               </SelectTrigger>
               <SelectContent>
                 {priceTypes.map((pt) => (
-                  <SelectItem key={pt.id} value={pt.id.toString()}>
+                  <SelectItem key={pt.id} value={pt.id.toString()} className="bg-white">
                     {pt.name}
                   </SelectItem>
                 ))}

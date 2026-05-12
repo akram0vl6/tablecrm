@@ -11,20 +11,60 @@ import { ProductSearch } from "@/widgets/ProductSearch";
 import { Cart } from "@/widgets/Cart";
 import { CommentSection } from "@/widgets/CommentSection";
 import { SaleActions } from "@/widgets/SaleActions";
+import { Toast } from "@/widgets/Toast";
+import { useState } from "react";
 
 export default function Home() {
   const crm = useTableCRM();
 
+    // Счётчик для принудительного обновления ключа
+    const [errorKey, setErrorKey] = useState(0);
+    const [successKey, setSuccessKey] = useState(0);
+  
+    // Когда появляется ошибка — увеличиваем счётчик
+    if (crm.saleError && errorKey === 0) {
+      setErrorKey(prev => prev + 1);
+    }
+  
+    // Когда появляется успех — увеличиваем счётчик
+    if (crm.saleSuccess && successKey === 0) {
+      setSuccessKey(prev => prev + 1);
+    }
+  
+
   return (
     <div className="flex items-start justify-center p-4 bg-gray-50 min-h-screen">
-      <main className="w-full max-w-md space-y-5">
+      {crm.saleError && (
+        <Toast
+          key={errorKey}
+          message={crm.saleError}
+          type="error"
+          onClose={() => {
+            crm.setSaleError("");
+            setErrorKey(0); // сбрасываем для следующего раза
+          }}
+        />
+      )}
+      {crm.saleSuccess && (
+        <Toast
+          key={successKey}
+          message={crm.saleSuccess}
+          type="success"
+          onClose={() => {
+            crm.setSaleSuccess("");
+            setSuccessKey(0);
+          }}
+        />
+      )}
+
+      <main className="w-full max-w-md space-y-5 pb-24">
         <Card className="border-0 shadow-lg shadow-indigo-100 overflow-hidden">
           <CardHeader className="text-center pb-4 relative">
             <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
               <ShoppingCart className="h-6 w-6 text-indigo-600" />
             </div>
             <CardTitle className="text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            tablecrm.com
+              tablecrm.com
             </CardTitle>
             <p className="text-lg font-bold text-gray-800">Мобильный заказ</p>
             <p className="text-sm text-gray-500">Создание продажи и проведение в один клик</p>
@@ -86,9 +126,6 @@ export default function Home() {
           onCreateSale={() => crm.handleCreateSale(false)}
           onCreateAndConduct={() => crm.handleCreateSale(true)}
         />
-
-        {crm.saleError && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg -mt-3">{crm.saleError}</div>}
-        {crm.saleSuccess && <div className="text-sm text-green-600 bg-green-50 p-3 rounded-lg -mt-3">{crm.saleSuccess}</div>}
       </main>
     </div>
   );
