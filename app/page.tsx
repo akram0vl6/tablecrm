@@ -1,64 +1,94 @@
-import Image from "next/image";
+"use client";
+
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ShoppingCart } from "lucide-react";
+import { useTableCRM } from "@/hooks/useTableCRM";
+import { TokenAuth } from "@/widgets/TokenAuth";
+import { ClientSearch } from "@/widgets/ClientSearch";
+import { SaleParams } from "@/widgets/SaleParams";
+import { ProductSearch } from "@/widgets/ProductSearch";
+import { Cart } from "@/widgets/Cart";
+import { CommentSection } from "@/widgets/CommentSection";
+import { SaleActions } from "@/widgets/SaleActions";
 
 export default function Home() {
+  const crm = useTableCRM();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="flex items-start justify-center p-4 bg-gray-50 min-h-screen">
+      <main className="w-full max-w-md space-y-5">
+        <Card className="border-0 shadow-lg shadow-indigo-100 overflow-hidden">
+          <CardHeader className="text-center pb-4 relative">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
+              <ShoppingCart className="h-6 w-6 text-indigo-600" />
+            </div>
+            <CardTitle className="text-2xl font-black tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            tablecrm.com
+            </CardTitle>
+            <p className="text-lg font-bold text-gray-800">Мобильный заказ</p>
+            <p className="text-sm text-gray-500">Создание продажи и проведение в один клик</p>
+            <Badge
+              variant={crm.isConnected ? "default" : "destructive"}
+              className={`mt-3 ${crm.isConnected ? "bg-green-100 text-green-700" : ""}`}
+            >
+              {crm.isConnected ? "● Касса подключена" : "○ Касса не подключена"}
+            </Badge>
+          </CardHeader>
+        </Card>
+
+        <TokenAuth
+          token={crm.token} setToken={crm.setToken}
+          isConnected={crm.isConnected} onConnect={crm.handleConnect}
+          loadingDictionaries={crm.loadingDictionaries} dictionariesError={crm.dictionariesError}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        <ClientSearch
+          phone={crm.phone} setPhone={crm.setPhone}
+          isConnected={crm.isConnected} onSearch={crm.handleSearchClient}
+          isSearching={crm.isSearchingClient} client={crm.client} clientError={crm.clientError}
+          onClearClient={() => crm.setClient(null)}
+        />
+
+        <SaleParams
+          isConnected={crm.isConnected}
+          organizations={crm.organizations} payboxes={crm.payboxes}
+          warehouses={crm.warehouses} priceTypes={crm.priceTypes}
+          selectedOrg={crm.selectedOrg} setSelectedOrg={crm.setSelectedOrg}
+          selectedPaybox={crm.selectedPaybox} setSelectedPaybox={crm.setSelectedPaybox}
+          selectedWarehouse={crm.selectedWarehouse} setSelectedWarehouse={crm.setSelectedWarehouse}
+          selectedPriceType={crm.selectedPriceType} setSelectedPriceType={crm.setSelectedPriceType}
+        />
+
+        <ProductSearch
+          isConnected={crm.isConnected}
+          searchProduct={crm.searchProduct} onSearch={crm.handleSearchProducts}
+          isSearching={crm.isSearchingProducts} foundProducts={crm.foundProducts}
+          productSearchOpen={crm.productSearchOpen} onToggleSearch={crm.setProductSearchOpen}
+          onAddToCart={crm.addToCart}
+        />
+
+        <Cart
+          items={crm.cartItems}
+          onUpdateQuantity={crm.updateCartItemQuantity}
+          onUpdatePrice={crm.updateCartItemPrice}
+          onRemoveItem={crm.removeCartItem}
+          totalSum={crm.totalSum}
+        />
+
+        <CommentSection
+          comment={crm.comment} setComment={crm.setComment} isConnected={crm.isConnected}
+        />
+
+        <SaleActions
+          isConnected={crm.isConnected} cartEmpty={crm.cartItems.length === 0}
+          isCreating={crm.isCreatingSale}
+          onCreateSale={() => crm.handleCreateSale(false)}
+          onCreateAndConduct={() => crm.handleCreateSale(true)}
+        />
+
+        {crm.saleError && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg -mt-3">{crm.saleError}</div>}
+        {crm.saleSuccess && <div className="text-sm text-green-600 bg-green-50 p-3 rounded-lg -mt-3">{crm.saleSuccess}</div>}
       </main>
     </div>
   );
