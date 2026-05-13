@@ -72,7 +72,6 @@ export function ProductSearch({
                 key={product.id}
                 className="flex justify-between items-center px-3 py-2.5 hover:bg-indigo-50 cursor-pointer"
                 onMouseDown={(e) => {
-                  // Предотвращаем onBlur, чтобы успеть кликнуть
                   e.preventDefault();
                   onAddToCart(product);
                 }}

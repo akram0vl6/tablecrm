@@ -19,14 +19,14 @@ export function SaleActions({ isConnected, cartEmpty, isCreating, onCreateSale, 
           onClick={onCreateSale}
           disabled={!isConnected || cartEmpty || isCreating}
         >
-          {isCreating ? "Создание..." : "Создать продажу"}
+          {"Создать продажу"}
         </Button>
         <Button
           className="flex-1 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 shadow-md hover:shadow-lg transition-all duration-300"
           onClick={onCreateAndConduct}
           disabled={!isConnected || cartEmpty || isCreating}
         >
-          {isCreating ? "Создание..." : "Создать и провести"}
+          {"Создать и провести"}
         </Button>
       </div>
     </div>

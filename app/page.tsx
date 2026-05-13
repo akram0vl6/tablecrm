@@ -17,16 +17,14 @@ import { useState } from "react";
 export default function Home() {
   const crm = useTableCRM();
 
-    // Счётчик для принудительного обновления ключа
     const [errorKey, setErrorKey] = useState(0);
     const [successKey, setSuccessKey] = useState(0);
-  
-    // Когда появляется ошибка — увеличиваем счётчик
+
     if (crm.saleError && errorKey === 0) {
       setErrorKey(prev => prev + 1);
     }
   
-    // Когда появляется успех — увеличиваем счётчик
+
     if (crm.saleSuccess && successKey === 0) {
       setSuccessKey(prev => prev + 1);
     }
@@ -41,7 +39,7 @@ export default function Home() {
           type="error"
           onClose={() => {
             crm.setSaleError("");
-            setErrorKey(0); // сбрасываем для следующего раза
+            setErrorKey(0);
           }}
         />
       )}

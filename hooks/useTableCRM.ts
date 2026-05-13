@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import type { CartItem } from "@/types";
 
 export function useTableCRM() {
-  // ---------- состояния ----------
   const [token, setToken] = useState("");
   const [isConnected, setIsConnected] = useState(false);
 
@@ -38,7 +37,6 @@ export function useTableCRM() {
 
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // ---------- инициализация токена из localStorage ----------
   useEffect(() => {
     const saved = localStorage.getItem("tablecrm_token");
     if (saved) {
@@ -47,7 +45,6 @@ export function useTableCRM() {
     }
   }, []);
 
-  // ---------- загрузка справочников ----------
   useEffect(() => {
     if (!isConnected || !token) return;
     setLoadingDictionaries(true);
@@ -68,7 +65,7 @@ export function useTableCRM() {
       .finally(() => setLoadingDictionaries(false));
   }, [isConnected, token]);
 
-  // ---------- обработчики ----------
+
   const handleConnect = () => {
     if (!token.trim()) return;
     localStorage.setItem("tablecrm_token", token);
@@ -98,29 +95,29 @@ export function useTableCRM() {
   const handleSearchProducts = useCallback((query: string) => {
     setSearchProduct(query);
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
-    
+
     if (!query.trim() || !token) {
       setFoundProducts([]);
       setProductSearchOpen(false);
       return;
     }
-    
+
     setIsSearchingProducts(true);
-    
+
     searchTimerRef.current = setTimeout(async () => {
       try {
         const res = await fetch(`/api/nomenclature?search=${encodeURIComponent(query)}&token=${token}`);
         if (res.ok) {
           const data = await res.json();
           const allProducts = data.result || [];
-          
+
           // КЛИЕНТСКАЯ ФИЛЬТРАЦИЯ — если API не фильтрует
-          const filtered = allProducts.filter((product: any) => 
+          const filtered = allProducts.filter((product: any) =>
             product.name?.toLowerCase().includes(query.toLowerCase())
           );
-          
+
           console.log(`🔍 Запрос: "${query}" | API вернул: ${allProducts.length} | После фильтра: ${filtered.length}`);
-          
+
           setFoundProducts(filtered);
           setProductSearchOpen(filtered.length > 0);
         } else {
@@ -134,7 +131,8 @@ export function useTableCRM() {
         setIsSearchingProducts(false);
       }
     }, 500);
-  }, [token]);
+  }, [token])
+
   const addToCart = (product: any) => {
     const idx = cartItems.findIndex(i => i.nomenclature_id === product.id);
     if (idx >= 0) {
@@ -155,36 +153,36 @@ export function useTableCRM() {
   };
 
   const MAX_PRICE_LENGTH = 6;
-  const MAX_QUANTITY = 20;   
-  
+  const MAX_QUANTITY = 20;
+
   const updateCartItemPrice = (id: number, newPrice: number) => {
 
     let price = Math.round(newPrice * 100) / 100;
-    
+
     const parts = price.toString().split('.');
     if (parts[0].length > MAX_PRICE_LENGTH) {
       parts[0] = parts[0].slice(0, MAX_PRICE_LENGTH);
       price = parseFloat(parts.join('.'));
     }
-    
+
 
     price = Math.max(0, price);
-    
+
     setCartItems(prev =>
       prev.map(item =>
         item.nomenclature_id === id ? { ...item, price } : item
       )
     );
   };
-  
+
   const updateCartItemQuantity = (id: number, delta: number) => {
     setCartItems(prev =>
       prev.map(item => {
         if (item.nomenclature_id !== id) return item;
         const newQuantity = item.quantity + delta;
-        return { 
-          ...item, 
-          quantity: Math.max(0, Math.min(newQuantity, MAX_QUANTITY)) 
+        return {
+          ...item,
+          quantity: Math.max(0, Math.min(newQuantity, MAX_QUANTITY))
         };
       }).filter(item => item.quantity > 0)
     );
@@ -205,38 +203,67 @@ export function useTableCRM() {
       setSaleError("Добавьте хотя бы один товар");
       return;
     }
+
     setIsCreatingSale(true);
     setSaleError("");
     setSaleSuccess("");
+
     try {
-      const payload: any = {
-        organization_id: Number(selectedOrg),
-        paybox_id: Number(selectedPaybox),
-        warehouse_id: Number(selectedWarehouse),
-        price_type_id: Number(selectedPriceType),
-        comment,
-        items: cartItems.map(item => ({
-          nomenclature_id: item.nomenclature_id,
-          quantity: item.quantity,
-          price: item.price,
+      const orderItem = {
+        organization: Number(selectedOrg),
+        warehouse: Number(selectedWarehouse),
+        paybox: Number(selectedPaybox),
+        comment: comment || "",
+        goods: cartItems.map(item => ({
+          nomenclature: Number(item.nomenclature_id),
+          quantity: Number(item.quantity),
+          price: Number(item.price),
+          price_type: Number(selectedPriceType),
         })),
+        ...(client?.id && { client: Number(client.id) }),
+        ...(conduct && { generate_out: true }),
       };
-      if (client) payload.client_id = client.id;
-      if (conduct) payload.do_conduct = true;
+
+      const payload = [orderItem];
+
+
 
       const res = await fetch(`/api/docs_sales?token=${token}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("Ошибка создания продажи");
-      setSaleSuccess(`Продажа ${conduct ? "создана и проведена" : "создана"} успешно!`);
-      setCartItems([]);
-      setClient(null);
-      setPhone("");
-      setComment("");
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        let errorMessage = 'Ошибка создания продажи';
+        if (data.detail) {
+          if (Array.isArray(data.detail)) {
+            errorMessage = data.detail.map((err: any) =>
+              err.loc ? `${err.loc.join(' → ')}: ${err.msg}` : JSON.stringify(err)
+            ).join('; ');
+          } else if (typeof data.detail === 'string') {
+            errorMessage = data.detail;
+          }
+        }
+        throw new Error(errorMessage);
+      }
+
+
+      const createdOrders = Array.isArray(data) ? data : data.result;
+      if (createdOrders && createdOrders.length > 0) {
+        setSaleSuccess(`Продажа ${conduct ? "создана и проведена" : "создана"} успешно!`);
+        setCartItems([]);
+        setClient(null);
+        setPhone("");
+        setComment("");
+      } else {
+        throw new Error('Созданные заказы не найдены в ответе');
+      }
     } catch (error: any) {
-      setSaleError(error.message || "Произошла ошибка");
+      console.error('💥 Error:', error);
+      setSaleError(error.message || "Произошла ошибка при создании продажи");
     } finally {
       setIsCreatingSale(false);
     }
@@ -245,7 +272,6 @@ export function useTableCRM() {
 
 
   return {
-    // состояния
     token, setToken, isConnected,
     organizations, payboxes, warehouses, priceTypes,
     selectedOrg, setSelectedOrg, selectedPaybox, setSelectedPaybox,
@@ -254,9 +280,8 @@ export function useTableCRM() {
     searchProduct, foundProducts, isSearchingProducts, cartItems, productSearchOpen, setProductSearchOpen,
     comment, setComment,
     loadingDictionaries, dictionariesError,
-    isCreatingSale, saleError, saleSuccess,
+    isCreatingSale, saleError, setSaleError, saleSuccess, setSaleSuccess,
     totalSum,
-    // методы
     handleConnect, handleSearchClient, handleSearchProducts,
     addToCart, updateCartItemQuantity, updateCartItemPrice, removeCartItem,
     handleCreateSale,

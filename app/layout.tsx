@@ -8,6 +8,11 @@ const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 export const metadata: Metadata = {
   title: "ТАВЛЕСРМ - Мобильный заказ",
   description: "WebApp для создания продажи",
+  icons: {
+    icon: "https://tablecrm.com/img/logo.svg",
+    shortcut: "https://tablecrm.com/img/logo.svg",
+    apple: "https://tablecrm.com/img/logo.svg",
+  },
 };
 
 export const viewport: Viewport = {
@@ -29,7 +34,6 @@ export default function RootLayout({
       )}>
         {children}
       </body>
-
     </html>
   );
 }

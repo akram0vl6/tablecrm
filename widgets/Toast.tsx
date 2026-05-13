@@ -14,18 +14,10 @@ export function Toast({ message, type, onClose, duration = 3000 }: ToastProps) {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    // Сбрасываем предыдущий таймер если был
-    if (timerRef.current) clearTimeout(timerRef.current);
-    
-    // Сбрасываем состояние и запускаем заново
-    setIsVisible(false);
-    
-    // Небольшая задержка чтобы сбросилась анимация
     const showTimer = setTimeout(() => {
       setIsVisible(true);
     }, 50);
 
-    // Таймер автозакрытия
     timerRef.current = setTimeout(() => {
       setIsVisible(false);
       setTimeout(() => onClose(), 300);
@@ -35,7 +27,7 @@ export function Toast({ message, type, onClose, duration = 3000 }: ToastProps) {
       clearTimeout(showTimer);
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [message, type, duration]); // перезапускаем при каждом новом message
+  }, [message, type, duration]);
 
   return (
     <div
