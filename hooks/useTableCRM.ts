@@ -29,8 +29,6 @@ export function useTableCRM() {
 
   const [comment, setComment] = useState("");
 
-  const [loadingDictionaries, setLoadingDictionaries] = useState(false);
-  const [dictionariesError, setDictionariesError] = useState("");
   const [isCreatingSale, setIsCreatingSale] = useState(false);
   const [saleError, setSaleError] = useState("");
   const [saleSuccess, setSaleSuccess] = useState("");
@@ -47,8 +45,6 @@ export function useTableCRM() {
 
   useEffect(() => {
     if (!isConnected || !token) return;
-    setLoadingDictionaries(true);
-    setDictionariesError("");
     Promise.all([
       fetch(`/api/organizations?token=${token}`).then(r => r.json()),
       fetch(`/api/payboxes?token=${token}`).then(r => r.json()),
@@ -61,8 +57,6 @@ export function useTableCRM() {
         setWarehouses(wh.result || []);
         setPriceTypes(pt.result || []);
       })
-      .catch(() => setDictionariesError("Ошибка загрузки справочников"))
-      .finally(() => setLoadingDictionaries(false));
   }, [isConnected, token]);
 
 
@@ -115,8 +109,6 @@ export function useTableCRM() {
           const filtered = allProducts.filter((product: any) =>
             product.name?.toLowerCase().includes(query.toLowerCase())
           );
-
-          console.log(`🔍 Запрос: "${query}" | API вернул: ${allProducts.length} | После фильтра: ${filtered.length}`);
 
           setFoundProducts(filtered);
           setProductSearchOpen(filtered.length > 0);
@@ -262,7 +254,7 @@ export function useTableCRM() {
         throw new Error('Созданные заказы не найдены в ответе');
       }
     } catch (error: any) {
-      console.error('💥 Error:', error);
+      console.error('Error:', error);
       setSaleError(error.message || "Произошла ошибка при создании продажи");
     } finally {
       setIsCreatingSale(false);
@@ -279,7 +271,6 @@ export function useTableCRM() {
     phone, setPhone, client, setClient, isSearchingClient, clientError,
     searchProduct, foundProducts, isSearchingProducts, cartItems, productSearchOpen, setProductSearchOpen,
     comment, setComment,
-    loadingDictionaries, dictionariesError,
     isCreatingSale, saleError, setSaleError, saleSuccess, setSaleSuccess,
     totalSum,
     handleConnect, handleSearchClient, handleSearchProducts,

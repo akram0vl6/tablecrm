@@ -1,13 +1,9 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { X, CheckCircle, AlertCircle } from "lucide-react";
+import { ToastProps } from "@/types";
 
-interface ToastProps {
-  message: string;
-  type: "success" | "error";
-  onClose: () => void;
-  duration?: number;
-}
+
 
 export function Toast({ message, type, onClose, duration = 3000 }: ToastProps) {
   const [isVisible, setIsVisible] = useState(false);

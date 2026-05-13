@@ -4,17 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { User, Search, X } from "lucide-react";
+import { ClientSearchProps } from "@/types";
 
-interface ClientSearchProps {
-  phone: string;
-  setPhone: (v: string) => void;
-  isConnected: boolean;
-  onSearch: () => void;
-  isSearching: boolean;
-  client: any;
-  clientError: string;
-  onClearClient: () => void;
-}
+
 
 export function ClientSearch({ phone, setPhone, isConnected, onSearch, isSearching, client, clientError, onClearClient }: ClientSearchProps) {
   return (

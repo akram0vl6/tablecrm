@@ -2,18 +2,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ProductSearchProps } from "@/types";
 import { Search, Package, Plus } from "lucide-react";
 
-interface ProductSearchProps {
-  isConnected: boolean;
-  searchProduct: string;
-  onSearch: (query: string) => void;
-  isSearching: boolean;
-  foundProducts: any[];
-  productSearchOpen: boolean;
-  onToggleSearch: (open: boolean) => void;
-  onAddToCart: (product: any) => void;
-}
+
 
 export function ProductSearch({
   isConnected,

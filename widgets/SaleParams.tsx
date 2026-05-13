@@ -1,23 +1,10 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SaleParamsProps } from "@/types";
 import { Building2, CreditCard, Warehouse, Tag } from "lucide-react";
 
-interface SaleParamsProps {
-  isConnected: boolean;
-  organizations: any[];
-  payboxes: any[];
-  warehouses: any[];
-  priceTypes: any[];
-  selectedOrg: string;
-  setSelectedOrg: (v: string) => void;
-  selectedPaybox: string;
-  setSelectedPaybox: (v: string) => void;
-  selectedWarehouse: string;
-  setSelectedWarehouse: (v: string) => void;
-  selectedPriceType: string;
-  setSelectedPriceType: (v: string) => void;
-}
+
 
 export function SaleParams({ isConnected, organizations, payboxes, warehouses, priceTypes, selectedOrg, setSelectedOrg, selectedPaybox, setSelectedPaybox, selectedWarehouse, setSelectedWarehouse, selectedPriceType, setSelectedPriceType }: SaleParamsProps) {
   return (

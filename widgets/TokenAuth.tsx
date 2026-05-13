@@ -4,19 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Key } from "lucide-react";
+import { TokenAuthProps } from "@/types";
 
-interface TokenAuthProps {
-  token: string;
-  setToken: (v: string) => void;
-  isConnected: boolean;
-  onConnect: () => void;
-  loadingDictionaries: boolean;
-  dictionariesError: string;
-}
 
-export function TokenAuth({ token, setToken, isConnected, onConnect, loadingDictionaries, dictionariesError }: TokenAuthProps) {
+
+export function TokenAuth({ token, setToken, isConnected, onConnect }: TokenAuthProps) {
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
+    <Card className="shadow-md hover:shadow-lg duration-300">
       <CardContent className="pt-5 space-y-3">
         <div className="flex items-center gap-2 text-indigo-700">
           <Key className="h-5 w-5" />
@@ -39,15 +33,7 @@ export function TokenAuth({ token, setToken, isConnected, onConnect, loadingDict
         >
           Подключить
         </Button>
-        {loadingDictionaries && (
-          <div className="space-y-2 ml-7">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-          </div>
-        )}
-        {dictionariesError && (
-          <p className="text-sm text-red-600 ml-7">{dictionariesError}</p>
-        )}
+        
       </CardContent>
     </Card>
   );

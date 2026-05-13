@@ -1,13 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { SaleActionsProps } from "@/types";
 
-interface SaleActionsProps {
-  isConnected: boolean;
-  cartEmpty: boolean;
-  isCreating: boolean;
-  onCreateSale: () => void;
-  onCreateAndConduct: () => void;
-}
 
 export function SaleActions({ isConnected, cartEmpty, isCreating, onCreateSale, onCreateAndConduct }: SaleActionsProps) {
   return (

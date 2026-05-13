@@ -78,7 +78,6 @@ export default function Home() {
         <TokenAuth
           token={crm.token} setToken={crm.setToken}
           isConnected={crm.isConnected} onConnect={crm.handleConnect}
-          loadingDictionaries={crm.loadingDictionaries} dictionariesError={crm.dictionariesError}
         />
 
         <ClientSearch

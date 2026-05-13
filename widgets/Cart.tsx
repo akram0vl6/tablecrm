@@ -3,15 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShoppingCart, Minus, Plus, X } from "lucide-react";
-import type { CartItem } from "@/types";
+import type { CartProps } from "@/types";
 
-interface CartProps {
-  items: CartItem[];
-  onUpdateQuantity: (id: number, delta: number) => void;
-  onUpdatePrice: (id: number, price: number) => void;
-  onRemoveItem: (id: number) => void;
-  totalSum: number;
-}
+
 
 function formatPrice(value: number) {
   return value.toLocaleString("ru-RU", {

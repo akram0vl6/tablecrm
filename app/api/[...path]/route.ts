@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     const apiUrl = `https://app.tablecrm.com/api/v1/${path}/?token=${token}`;
-    console.log('🔵 [POST] Proxying to:', apiUrl);
 
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -53,14 +52,12 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(body),
     });
     
-    console.log('📥 [POST] External API status:', response.status);
-    console.log('📥 [POST] External API headers:', Object.fromEntries(response.headers.entries()));
-    
+
     const data = await response.json();
     
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
-    console.error('🔴 [POST] Proxy error:', error);
+
     return NextResponse.json({ 
       error: 'Proxy error', 
       details: error instanceof Error ? error.message : 'Unknown error' 

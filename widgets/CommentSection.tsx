@@ -1,13 +1,10 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { CommentSectionProps } from "@/types";
 import { MessageSquare } from "lucide-react";
 
-interface CommentSectionProps {
-  comment: string;
-  setComment: (v: string) => void;
-  isConnected: boolean;
-}
+
 
 export function CommentSection({ comment, setComment, isConnected }: CommentSectionProps) {
   return (
